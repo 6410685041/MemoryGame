@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct MemoryGameModel<CardContentType> {
+struct MemoryGameModel<CardContentType: Equatable> {
     private(set) var cards: Array<Card>
     // private(set) can only read but can't write
     
@@ -21,9 +21,28 @@ struct MemoryGameModel<CardContentType> {
         shuffle()
     }
     
+    var indexOfTheOneAndOnlyFaceUpCard: Int?
+    private mutating func faceDownAll() {
+        for index in cards.indices {
+            cards[index].isFaceUp = false
+        }
+    }
     mutating func choose(_ card: Card) { // _ mean dont have to write name when use this function
         let chosenIndex = index(of: card)
-        cards[chosenIndex].isFaceUp.toggle()
+        if !cards[chosenIndex].isFaceUp && !cards[chosenIndex].isMatched {
+            if let potentialMatchIndex = indexOfTheOneAndOnlyFaceUpCard {
+                if cards[chosenIndex].content == cards[potentialMatchIndex].content {
+                    cards[chosenIndex].isMatched = true
+                    cards[potentialMatchIndex].isMatched = true
+                    indexOfTheOneAndOnlyFaceUpCard = nil
+                }
+            } else {
+                indexOfTheOneAndOnlyFaceUpCard = chosenIndex
+                faceDownAll()
+            }
+            
+        }
+        cards[chosenIndex].isFaceUp = true
     }
     
     private func index(of card: Card) -> Int {
@@ -39,7 +58,8 @@ struct MemoryGameModel<CardContentType> {
         cards.shuffle()
     }
     
-    struct Card: Identifiable { // must use MemoryGameModel first before use this class ex. MemoryGameModel.Card(content: "")
+    struct Card: Identifiable, Equatable { // must use MemoryGameModel first before use this class ex. MemoryGameModel.Card(content: "")
+        // Equatable - Can be compared
         var isFaceUp: Bool = false
         var isMatched: Bool = false
         let content: CardContentType
