@@ -34,15 +34,14 @@ struct MemoryGameModel<CardContentType: Equatable> {
                 if cards[chosenIndex].content == cards[potentialMatchIndex].content {
                     cards[chosenIndex].isMatched = true
                     cards[potentialMatchIndex].isMatched = true
-                    indexOfTheOneAndOnlyFaceUpCard = nil
                 }
+                indexOfTheOneAndOnlyFaceUpCard = nil
             } else {
                 indexOfTheOneAndOnlyFaceUpCard = chosenIndex
                 faceDownAll()
             }
-            
+            cards[chosenIndex].isFaceUp = true
         }
-        cards[chosenIndex].isFaceUp = true
     }
     
     private func index(of card: Card) -> Int {
